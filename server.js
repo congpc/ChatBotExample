@@ -171,15 +171,6 @@ const actions = {
       return resolve(context);
     });
   }
-  // getWeather({sessionId, context, text, entities}) {
-  //   logger.log('info', context);
-  //   console.log(`Session ${sessionId} received ${text}`);
-  //   console.log(`The current context is ${JSON.stringify(context)}`);
-  //   console.log(`Wit extracted ${JSON.stringify(entities)}`);
-  //   // context.location = '';
-  //   context.weather = 'tốt';
-  //   return Promise.resolve(context);
-  // }
 };
 
 // Setting up our bot
@@ -372,7 +363,7 @@ function receivedMessage(event) {
       default: {
         // We received a text message
         
-        //Echo message
+        // Echo message
         // sendTextMessage(senderID, 'Echo:' + messageText);
         
         // We retrieve the user's current session, or create one if it doesn't exist
@@ -403,22 +394,6 @@ function receivedMessage(event) {
         }).catch((err) => {
           logger.log('error', 'Oops! Got an error from Wit: ', err.stack || err);
         });
-        
-        // client.message(messageText, {})
-        // .then((data) => {
-        //   var witMessage = JSON.stringify(data);
-        //   // logger.log('info','Wit.ai response: ' + witMessage);
-        //   sendTextMessage(senderID, witMessage);
-        // })
-        // .catch(console.error);
-        
-        // client.converse(sessionId, messageText, {})
-        // .then((data) => {
-        //   var witString = JSON.stringify(data);
-        //   logger.log('info', 'Wit response:' + witString);
-        //   sendTextMessage(senderID, data.msg);
-        // })
-        // .catch(console.error);
       }
     }
   } else if (messageAttachments) {
