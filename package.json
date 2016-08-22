@@ -15,7 +15,12 @@
     "express": "^4.13.4",
     "config": "^1.20.4",
     "request": "^2.72.0",
-    "body-parser": "^1.15.0"
+    "body-parser": "^1.15.0",
+    "node-fetch": "^1.5.1",
+    "node-wit": "^4.0.0",
+    "isomorphic-fetch": "^2.2.1",
+    "node-uuid": "^1.4.7",
+    "winston": "^2.2.0"
   },
   "engines": {
     "node": "~4.1.2"

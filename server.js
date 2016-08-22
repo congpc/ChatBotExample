@@ -6,14 +6,16 @@
 
 'use strict';
 
-var http = require('http');
-var express = require('express');
-var bodyParser = require('body-parser');
+const http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
+const request = require('request');
+const config = require('config');
+const fetch = require('node-fetch');
+var logger = require('./utils/logger.js');
+
 var router = express();
 var server = http.createServer(router);
-var request = require('request');
-var config = require('config');
-
 router.use(bodyParser.urlencoded({
   extended: false,
   limit: 2 * 1024 * 1024
@@ -27,35 +29,169 @@ router.use(bodyParser.json({
  * set them using environment variables or modifying the config file in /config.
  *
  */
-
 // App Secret can be retrieved from the App Dashboard
 const APP_SECRET = (process.env.MESSENGER_APP_SECRET) ? 
-  process.env.MESSENGER_APP_SECRET :
-  config.get('appSecret');
+  process.env.MESSENGER_APP_SECRET : config.get('appSecret');
 
 // Arbitrary value used to validate a webhook
 const VALIDATION_TOKEN = (process.env.MESSENGER_VALIDATION_TOKEN) ?
-  (process.env.MESSENGER_VALIDATION_TOKEN) :
-  config.get('validationToken');
+  (process.env.MESSENGER_VALIDATION_TOKEN) : config.get('validationToken');
 
 // Generate a page access token for your page from the App Dashboard
 const PAGE_ACCESS_TOKEN = (process.env.MESSENGER_PAGE_ACCESS_TOKEN) ?
-  (process.env.MESSENGER_PAGE_ACCESS_TOKEN) :
-  config.get('pageAccessToken');
+  (process.env.MESSENGER_PAGE_ACCESS_TOKEN) : config.get('pageAccessToken');
 
 // URL where the app is running (include protocol). Used to point to scripts and 
 // assets located at this address. 
-const SERVER_URL = (process.env.SERVER_URL) ?
-  (process.env.SERVER_URL) :
-  config.get('serverURL');
+const SERVER_URL = (process.env.SERVER_URL) ? 
+  (process.env.SERVER_URL) : config.get('serverURL');
+
+// Wit.ai parameters
+const WIT_TOKEN = (process.env.WIT_TOKEN) ? 
+  (process.env.WIT_TOKEN) : config.get('witTokken');
+
+console.log(WIT_TOKEN);
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   console.error("Missing config values");
+  logger.log('error',"Missing config values");
   process.exit(1);
 }
 
+// ----------------------------------------------------------------------------
+// Messenger API specific code
+
+// See the Send API reference
+// https://developers.facebook.com/docs/messenger-platform/send-api-reference
+
+const fbMessage = (id, text) => {
+  const body = JSON.stringify({
+    recipient: { id },
+    message: { text },
+  });
+  const qs = 'access_token=' + encodeURIComponent(PAGE_ACCESS_TOKEN);
+  return fetch('https://graph.facebook.com/me/messages?' + qs, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body,
+  })
+  .then(rsp => rsp.json())
+  .then(json => {
+    if (json.error && json.error.message) {
+      throw new Error(json.error.message);
+    }
+    return json;
+  });
+};
+
+// ----------------------------------------------------------------------------
+// Wit.ai bot specific code
+// const {Wit, log} = require('node-wit');
+let Wit = require('node-wit').Wit;
+let log = require('node-wit').log;
+  
+// // This will contain all user sessions.
+// // Each session has an entry:
+// // sessionId -> {fbid: facebookUserId, context: sessionState}
+const sessions = {};
+const findOrCreateSession = (fbid) => {
+  let sessionId;
+  // Let's see if we already have a session for the user fbid
+  Object.keys(sessions).forEach(k => {
+    if (sessions[k].fbid === fbid) {
+      // Yep, got it!
+      sessionId = k;
+    }
+  });
+  if (!sessionId) {
+    // No session found for user fbid, let's create a new one
+    sessionId = new Date().toISOString();
+    sessions[sessionId] = {fbid: fbid, context: {}};
+  }
+  return sessionId;
+};
+const firstEntityValue = (entities, entity) => {
+  const val = entities && entities[entity] &&
+    Array.isArray(entities[entity]) &&
+    entities[entity].length > 0 &&
+    entities[entity][0].value
+  ;
+  if (!val) {
+    return null;
+  }
+  return typeof val === 'object' ? val.value : val;
+};
+
+
+// Our bot actions
+const actions = {
+  send({sessionId}, {text}) {
+    // Our bot has something to say!
+    // Let's retrieve the Facebook user whose session belongs to
+    const recipientId = sessions[sessionId].fbid;
+    if (recipientId) {
+      // Yay, we found our recipient!
+      // Let's forward our bot response to her.
+      // We return a promise to let our bot know when we're done sending
+      logger.log('info', 'Bot response:' + text);
+      return fbMessage(recipientId, text)
+      .then(() => null)
+      .catch((err) => {
+        logger.log('error', 'Oops! An error occurred while forwarding the response to',
+          recipientId, ':', err.stack || err);
+      });
+    } else {
+      logger.log('error', 'Oops! Couldn\'t find user for session:', sessionId);
+      // Giving the wheel back to our bot
+      return Promise.resolve();
+    }
+  },
+  getContact({context, entities}) {
+    return new Promise(function(resolve, reject) {
+      logger.log('info', 'Entities:' + JSON.stringify(entities));
+      var contact = firstEntityValue(entities, 'contact');
+      if (contact) {
+        context.client_name = contact;
+      } 
+      return resolve(context);
+    });
+  },
+  getWeather({context, entities}) {
+    return new Promise(function(resolve, reject) {
+      logger.log('info', 'context:' + context + 'entities:' + entities);
+      var location = firstEntityValue(entities, 'location');
+      if (location) {
+        context.weather = location; // we should call a weather API here
+        // delete context.missingLocation;
+      } 
+      // else {
+      //   context.missingLocation = true;
+      //   delete context.weather;
+      // }
+      return resolve(context);
+    });
+  }
+  // getWeather({sessionId, context, text, entities}) {
+  //   logger.log('info', context);
+  //   console.log(`Session ${sessionId} received ${text}`);
+  //   console.log(`The current context is ${JSON.stringify(context)}`);
+  //   console.log(`Wit extracted ${JSON.stringify(entities)}`);
+  //   // context.location = '';
+  //   context.weather = 'tốt';
+  //   return Promise.resolve(context);
+  // }
+};
+
+// Setting up our bot
+const witClient = new Wit({
+  accessToken: WIT_TOKEN,
+  actions,
+  logger: new log.Logger(log.DEBUG) // optional
+});
+
 router.get('/', function(req, res) {
   res.send("Home page. Server running...");
+  logger.log('info', 'Home page. Server running...');
 });
 
 /*
@@ -65,10 +201,10 @@ router.get('/', function(req, res) {
  */
 router.get('/webhook', function(req, res) {
   if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === VALIDATION_TOKEN) {
-    console.log("Validating webhook");
+    logger.log('info', 'Validating webhook');
     res.status(200).send(req.query['hub.challenge']);
   } else {
-    console.error("Failed validation. Make sure the validation tokens match.");
+    logger.log('error', 'Failed validation. Make sure the validation tokens match.');
     res.sendStatus(403);          
   }  
 });
@@ -170,21 +306,19 @@ function receivedMessage(event) {
     return;
   } else if (quickReply) {
     var quickReplyPayload = quickReply.payload;
-    console.log("Quick reply for message %s with payload %s",
-      messageId, quickReplyPayload);
-
+    console.log("Quick reply for message %s with payload %s", messageId, quickReplyPayload);
     sendTextMessage(senderID, "Quick reply tapped");
     return;
   }
 
   if (messageText) {
-
+    logger.log('info', 'User [' + senderID + '] said:' + messageText);
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
     switch (messageText) {
       case 'image':
-        // sendImageMessage(senderID);
+        sendImageMessage(senderID);
         break;
 
       // case 'gif':
@@ -235,8 +369,57 @@ function receivedMessage(event) {
       //   sendAccountLinking(senderID);
       //   break;
 
-      default:
-        sendTextMessage(senderID, 'Echo:' + messageText);
+      default: {
+        // We received a text message
+        
+        //Echo message
+        // sendTextMessage(senderID, 'Echo:' + messageText);
+        
+        // We retrieve the user's current session, or create one if it doesn't exist
+        // This is needed for our bot to figure out the conversation history
+        const sessionId = findOrCreateSession(senderID);
+        logger.log('info', 'Wit - SessionId:' + sessionId);
+        
+        // Let's forward the message to the Wit.ai Bot Engine
+        // This will run all actions until our bot has nothing left to do
+        witClient.runActions(
+          sessionId, // the user's current session
+          messageText, // the user's message
+          sessions[sessionId].context // the user's current session state
+        ).then((context) => {
+          // Our bot did everything it has to do.
+          // Now it's waiting for further messages to proceed.
+          logger.log('info', 'Waiting for next user messages');
+          // Based on the session state, you might want to reset the session.
+          // This depends heavily on the business logic of your bot.
+          if (context['stop']) {
+            logger.log('info', 'Delete session:' + sessions[sessionId]);
+            delete sessions[sessionId];
+          }
+          else {
+            // Updating the user's current session state
+            sessions[sessionId].context = context;
+          }
+        }).catch((err) => {
+          logger.log('error', 'Oops! Got an error from Wit: ', err.stack || err);
+        });
+        
+        // client.message(messageText, {})
+        // .then((data) => {
+        //   var witMessage = JSON.stringify(data);
+        //   // logger.log('info','Wit.ai response: ' + witMessage);
+        //   sendTextMessage(senderID, witMessage);
+        // })
+        // .catch(console.error);
+        
+        // client.converse(sessionId, messageText, {})
+        // .then((data) => {
+        //   var witString = JSON.stringify(data);
+        //   logger.log('info', 'Wit response:' + witString);
+        //   sendTextMessage(senderID, data.msg);
+        // })
+        // .catch(console.error);
+      }
     }
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
@@ -732,7 +915,7 @@ function sendAccountLinking(recipientId) {
  */
 function callSendAPI(messageData) {
   request({
-    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    uri: 'https://graph.facebook.com/me/messages',
     qs: { access_token: PAGE_ACCESS_TOKEN },
     method: 'POST',
     json: messageData
