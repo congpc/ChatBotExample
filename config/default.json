@@ -1,7 +1,7 @@
 {
-    "appSecret": "",
-    "pageAccessToken": "",
+    "appSecret": "a241092f46802ca7fd5bb6cd0a808906",
+    "pageAccessToken": "EAAMTzZAREGBUBAPo4MD9kZChZAlBZCDWeCRPUkBSDXUC37YD7hZC1QHtZBNTBgT4NK8dzMSHJDcvMfyghZC59ekcJxpOvFkC1M5c4VHECK9UWJhKMkWffJKUwnPK8wB89BJQqVdtiQNQMmvvsNhyTRDCIlesQcYkwNTeTG9eEhh0gZDZD",
     "validationToken": "verify-token",
-    "serverURL": "",
-    "witTokken": ""
+    "serverURL": "https://b373e472.ngrok.io",
+    "witTokken": "DXCQFNZ64TSIUBERBGUIZVLQV4TEQPS4"
 }

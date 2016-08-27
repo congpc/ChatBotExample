@@ -1,0 +1,40 @@
+{"level":"info","message":"Home page. Server running...","timestamp":"2016-08-27T07:59:25.715Z"}
+{"level":"info","message":"Validating webhook","timestamp":"2016-08-27T07:59:34.013Z"}
+{"level":"info","message":"User [1359058657441597] said:Chào bạn","timestamp":"2016-08-27T08:01:07.000Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T08:01:07.001Z","timestamp":"2016-08-27T08:01:07.001Z"}
+{"level":"info","message":"Bot response:Chào bạn, bạn tên gì?","timestamp":"2016-08-27T08:01:08.871Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T08:01:11.528Z"}
+{"level":"info","message":"User [1359058657441597] said:Mình tên Công","timestamp":"2016-08-27T08:01:15.397Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T08:01:07.001Z","timestamp":"2016-08-27T08:01:15.397Z"}
+{"level":"info","message":"Entities:{\"contact\":[{\"confidence\":0.994981585876409,\"type\":\"value\",\"value\":\"Công\",\"suggested\":true}],\"intent\":[{\"confidence\":0.9642151367906856,\"value\":\"xung_ten\"}]}","timestamp":"2016-08-27T08:01:16.576Z"}
+{"level":"info","message":"Bot response:Chào bạn, bạn tên gì?","timestamp":"2016-08-27T08:01:18.387Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T08:01:20.120Z"}
+{"level":"info","message":"User [1359058657441597] said:Chào bạn","timestamp":"2016-08-27T08:04:28.154Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T08:04:28.156Z","timestamp":"2016-08-27T08:04:28.157Z"}
+{"level":"info","message":"Bot response:Chào bạn, bạn tên gì?","timestamp":"2016-08-27T08:04:29.887Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T08:04:34.339Z"}
+{"level":"info","message":"User [1359058657441597] said:Mình tên Công","timestamp":"2016-08-27T08:04:37.644Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T08:04:28.156Z","timestamp":"2016-08-27T08:04:37.645Z"}
+{"level":"info","message":"Entities:{\"location\":[{\"confidence\":0.7288054744737963,\"type\":\"value\",\"value\":\"Công\",\"suggested\":true}],\"intent\":[{\"confidence\":0.9938399892842297,\"value\":\"xung_ten\"}]}","timestamp":"2016-08-27T08:04:39.303Z"}
+{"level":"info","message":"Bot response:Chào bạn, bạn tên gì?","timestamp":"2016-08-27T08:04:40.426Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T08:04:41.768Z"}
+{"level":"info","message":"User [1359058657441597] said:Chào bạn","timestamp":"2016-08-27T08:10:40.555Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T08:10:40.557Z","timestamp":"2016-08-27T08:10:40.557Z"}
+{"level":"info","message":"Bot response:Chào bạn, bạn tên gì?","timestamp":"2016-08-27T08:10:42.320Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T08:10:43.934Z"}
+{"level":"info","message":"User [1359058657441597] said:Mình tên Công","timestamp":"2016-08-27T08:10:47.635Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T08:10:40.557Z","timestamp":"2016-08-27T08:10:47.635Z"}
+{"level":"info","message":"Entities:{\"contact\":[{\"confidence\":0.994981585876409,\"type\":\"value\",\"value\":\"Công\",\"suggested\":true}],\"intent\":[{\"confidence\":0.9947270875149772,\"value\":\"xung_ten\"}]}","timestamp":"2016-08-27T08:10:48.597Z"}
+{"level":"info","message":"Bot response:Chào bạn Công, mình giúp gì cho bạn?","timestamp":"2016-08-27T08:10:49.416Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T08:10:50.721Z"}
+{"level":"info","message":"Home page. Server running...","timestamp":"2016-08-27T14:03:23.842Z"}
+{"level":"info","message":"Home page. Server running...","timestamp":"2016-08-27T14:03:37.941Z"}
+{"level":"info","message":"User [1359058657441597] said:Chào bạn","timestamp":"2016-08-27T14:10:24.646Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T14:10:24.647Z","timestamp":"2016-08-27T14:10:24.647Z"}
+{"level":"info","message":"Bot response:Chào bạn, bạn tên gì?","timestamp":"2016-08-27T14:10:32.751Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T14:10:38.358Z"}
+{"level":"info","message":"User [1359058657441597] said:Mình tên Công.","timestamp":"2016-08-27T14:10:48.536Z"}
+{"level":"info","message":"Wit - SessionId:2016-08-27T14:10:24.647Z","timestamp":"2016-08-27T14:10:48.536Z"}
+{"level":"info","message":"Entities:{\"contact\":[{\"confidence\":0.893312355865284,\"type\":\"value\",\"value\":\"Công\",\"suggested\":true}],\"intent\":[{\"confidence\":0.995440946519932,\"value\":\"xung_ten\"}]}","timestamp":"2016-08-27T14:11:11.966Z"}
+{"level":"info","message":"Bot response:Chào bạn Công, mình giúp gì cho bạn?","timestamp":"2016-08-27T14:11:21.896Z"}
+{"level":"info","message":"Waiting for next user messages","timestamp":"2016-08-27T14:11:24.150Z"}

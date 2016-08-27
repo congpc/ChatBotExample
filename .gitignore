@@ -38,3 +38,6 @@ jspm_packages
 
 # Configurations
 default.json
+
+# system file
+.DS_Store

@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const request = require('request');
 const config = require('config');
 const fetch = require('node-fetch');
-var logger = require('./utils/logger.js');
+const logger = require('./utils/logger.js');
 
 var router = express();
 var server = http.createServer(router);
@@ -50,8 +50,6 @@ const SERVER_URL = (process.env.SERVER_URL) ?
 const WIT_TOKEN = (process.env.WIT_TOKEN) ? 
   (process.env.WIT_TOKEN) : config.get('witTokken');
 
-console.log(WIT_TOKEN);
-
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   console.error("Missing config values");
   logger.log('error',"Missing config values");
@@ -86,7 +84,6 @@ const fbMessage = (id, text) => {
 
 // ----------------------------------------------------------------------------
 // Wit.ai bot specific code
-// const {Wit, log} = require('node-wit');
 let Wit = require('node-wit').Wit;
 let log = require('node-wit').log;
   
@@ -150,27 +147,13 @@ const actions = {
     return new Promise(function(resolve, reject) {
       logger.log('info', 'Entities:' + JSON.stringify(entities));
       var contact = firstEntityValue(entities, 'contact');
+      console.log('User name:' + contact);
       if (contact) {
-        context.client_name = contact;
+        context.user_name = contact;
       } 
       return resolve(context);
     });
   },
-  getWeather({context, entities}) {
-    return new Promise(function(resolve, reject) {
-      logger.log('info', 'context:' + context + 'entities:' + entities);
-      var location = firstEntityValue(entities, 'location');
-      if (location) {
-        context.weather = location; // we should call a weather API here
-        // delete context.missingLocation;
-      } 
-      // else {
-      //   context.missingLocation = true;
-      //   delete context.weather;
-      // }
-      return resolve(context);
-    });
-  }
 };
 
 // Setting up our bot
@@ -381,16 +364,9 @@ function receivedMessage(event) {
           // Our bot did everything it has to do.
           // Now it's waiting for further messages to proceed.
           logger.log('info', 'Waiting for next user messages');
-          // Based on the session state, you might want to reset the session.
-          // This depends heavily on the business logic of your bot.
-          if (context['stop']) {
-            logger.log('info', 'Delete session:' + sessions[sessionId]);
-            delete sessions[sessionId];
-          }
-          else {
-            // Updating the user's current session state
-            sessions[sessionId].context = context;
-          }
+          
+          // Updating the user's current session state
+          sessions[sessionId].context = context;
         }).catch((err) => {
           logger.log('error', 'Oops! Got an error from Wit: ', err.stack || err);
         });
