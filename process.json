@@ -1,0 +1,11 @@
+{
+  apps : [{
+          name        : "ChatBotExampleServer",
+          script      : "server.js",
+          watch       : false,
+          exec_mode   : "cluster",
+          env         : { "NODE_ENV": "development"},
+          env_staging : {"NODE_ENV": "staging"},
+          env_production : {"NODE_ENV": "production"}
+          }]
+}
